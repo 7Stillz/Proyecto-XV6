@@ -532,3 +532,22 @@ procdump(void)
     cprintf("\n");
   }
 }
+
+// Función para contar procesos activos (Entregable 2)
+int
+get_process_count(void)
+{
+  struct proc *p;
+  int count = 0;
+  
+  // Adquirimos el candado para leer la tabla sin que cambie mientras contamos
+  acquire(&ptable.lock);
+
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->state != UNUSED)
+      count++;
+  }
+
+  release(&ptable.lock);
+  return count;
+}

@@ -106,3 +106,9 @@ sys_trace(void)
 
   return 0; // Retornamos 0 indicando éxito
 }
+
+int
+sys_getprocs(void)
+{
+  return get_process_count();
+}
