@@ -6,7 +6,8 @@
 #include "proc.h"
 #include "x86.h"
 #include "syscall.h"
-
+// Variable global para controlar el rastreo
+int trace_active = 0;
 // User code makes a system call with INT T_SYSCALL.
 // System call number in %eax.
 // Arguments on the stack, from the user call to the C
@@ -103,6 +104,7 @@ extern int sys_unlink(void);
 extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
+extern int sys_trace(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -126,6 +128,32 @@ static int (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
+[SYS_trace]   sys_trace
+};
+
+static char *syscallnames[] = {
+[SYS_fork]    "fork",
+[SYS_exit]    "exit",
+[SYS_wait]    "wait",
+[SYS_pipe]    "pipe",
+[SYS_read]    "read",
+[SYS_kill]    "kill",
+[SYS_exec]    "exec",
+[SYS_fstat]   "fstat",
+[SYS_chdir]   "chdir",
+[SYS_dup]     "dup",
+[SYS_getpid]  "getpid",
+[SYS_sbrk]    "sbrk",
+[SYS_sleep]   "sleep",
+[SYS_uptime]  "uptime",
+[SYS_open]    "open",
+[SYS_write]   "write",
+[SYS_mknod]   "mknod",
+[SYS_unlink]  "unlink",
+[SYS_link]    "link",
+[SYS_mkdir]   "mkdir",
+[SYS_close]   "close",
+[SYS_trace]   "trace"
 };
 
 void
@@ -134,10 +162,24 @@ syscall(void)
   int num;
   struct proc *curproc = myproc();
 
+  // Lee el número de la llamada desde el registro EAX
   num = curproc->tf->eax;
+
+  // Verifica si el número es válido (existe en el arreglo)
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
+    
+    // 1. EJECUTA la llamada al sistema original
+    // El valor de retorno se guarda en curproc->tf->eax
     curproc->tf->eax = syscalls[num]();
+
+    // 2. INSTRUMENTACIÓN
+    // Si el rastreo está activo, imprimimos los detalles
+    if(trace_active) {
+      cprintf("syscall: %s -> ret: %d\n", syscallnames[num], curproc->tf->eax);
+    }
+
   } else {
+    // Si el número no es válido, imprime error
     cprintf("%d %s: unknown sys call %d\n",
             curproc->pid, curproc->name, num);
     curproc->tf->eax = -1;

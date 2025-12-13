@@ -6,6 +6,7 @@
 #include "memlayout.h"
 #include "mmu.h"
 #include "proc.h"
+extern int trace_active;
 
 int
 sys_fork(void)
@@ -88,4 +89,20 @@ sys_uptime(void)
   xticks = ticks;
   release(&tickslock);
   return xticks;
+}
+
+int
+sys_trace(void)
+{
+  int n;
+
+  // argint(0, &n) busca el primer argumento (índice 0) y lo guarda en 'n'.
+  // Si devuelve < 0, significa que hubo un error al leer.
+  if(argint(0, &n) < 0)
+    return -1;
+
+  // Asignamos el valor recibido a nuestra variable de control
+  trace_active = n;
+
+  return 0; // Retornamos 0 indicando éxito
 }
