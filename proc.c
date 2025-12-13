@@ -6,7 +6,7 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
-
+#include "uproc.h"
 struct {
   struct spinlock lock;
   struct proc proc[NPROC];
@@ -550,4 +550,31 @@ get_process_count(void)
 
   release(&ptable.lock);
   return count;
+}
+
+int
+get_process_info(struct uproc *table, int max)
+{
+  struct proc *p;
+  int i = 0;
+
+  acquire(&ptable.lock);
+  
+  // Recorremos la tabla de procesos
+  for(p = ptable.proc; p < &ptable.proc[NPROC] && i < max; p++){
+    if(p->state != UNUSED){
+      // Copiamos los datos del kernel a la estructura de usuario
+      table[i].pid = p->pid;
+      table[i].state = p->state;
+      table[i].sz = p->sz;
+      
+      // Copiamos el nombre (safestrcpy ya existe en xv6)
+      safestrcpy(table[i].name, p->name, sizeof(table[i].name));
+      
+      i++;
+    }
+  }
+
+  release(&ptable.lock);
+  return i; // Retornamos cuántos procesos encontramos
 }

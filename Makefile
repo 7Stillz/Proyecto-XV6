@@ -33,7 +33,10 @@ OBJS = \
 
 # Using native tools (e.g., on X86 Linux)
 #TOOLPREFIX = 
-TOOLPREFIX = i686-linux-gnu-
+# Intenta detectar si existe el compilador especial
+ifneq ($(shell which i686-linux-gnu-gcc 2>/dev/null),)
+	TOOLPREFIX = i686-linux-gnu-
+endif
 # Try to infer the correct TOOLPREFIX if not set
 ifndef TOOLPREFIX
 TOOLPREFIX := $(shell if i386-jos-elf-objdump -i 2>&1 | grep '^elf32-i386$$' >/dev/null 2>&1; \
@@ -183,6 +186,7 @@ UPROGS=\
 	_zombie\
 	_trace\
 	_uptime\
+	_psmem\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)

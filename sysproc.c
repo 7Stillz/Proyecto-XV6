@@ -6,6 +6,7 @@
 #include "memlayout.h"
 #include "mmu.h"
 #include "proc.h"
+#include "uproc.h"
 extern int trace_active;
 
 int
@@ -111,4 +112,17 @@ int
 sys_getprocs(void)
 {
   return get_process_count();
+}
+
+int
+sys_getprocsinfo(void)
+{
+  struct uproc *table;
+  int max;
+
+  // Leemos los argumentos: (puntero, entero)
+  if(argptr(0, (void*)&table, sizeof(*table)) < 0 || argint(1, &max) < 0)
+    return -1;
+
+  return get_process_info(table, max);
 }

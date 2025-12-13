@@ -121,6 +121,8 @@ int             wait(void);
 void            wakeup(void*);
 void            yield(void);
 int             get_process_count(void);
+struct uproc; 
+int             get_process_info(struct uproc*, int); 
 // swtch.S
 void            swtch(struct context**, struct context*);
 
