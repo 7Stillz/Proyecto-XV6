@@ -187,6 +187,8 @@ UPROGS=\
 	_trace\
 	_uptime\
 	_psmem\
+	_syscount\
+
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)

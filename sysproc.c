@@ -7,6 +7,10 @@
 #include "mmu.h"
 #include "proc.h"
 #include "uproc.h"
+#include "syscall.h"
+
+extern int syscall_count[NSYSCALLS];
+
 extern int trace_active;
 
 int
@@ -125,4 +129,22 @@ sys_getprocsinfo(void)
     return -1;
 
   return get_process_info(table, max);
+}
+
+/*
+ * Syscall ENTREGABLE 3:
+ * devuelve el número de invocaciones de una syscall
+ */
+int
+sys_getsyscount(void)
+{
+  int num;
+
+  if(argint(0, &num) < 0)
+    return -1;
+
+  if(num < 0 || num >= NSYSCALLS)
+    return -1;
+
+  return syscall_count[num];
 }
