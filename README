@@ -1,57 +1,50 @@
 # Proyecto de Extensión del Sistema Operativo XV6
 
-**Curso:** Sistemas Operativos  
-**Universidad Nacional Jorge Basadre Grohmann**
+Curso: Sistemas Operativos  
+Universidad Nacional Jorge Basadre Grohmann
 
 Este repositorio contiene el código fuente del sistema operativo XV6 modificado, incluyendo instrumentación de llamadas al sistema, herramientas de monitoreo de procesos y estadísticas de uso.
 
-## 👥 Integrantes
-* **[Tu Nombre Completo]** - [Tu Código]
-* **[Nombre de tu Compañero]** - [Código]
+## Integrantes
+Alexis Ricardo Erik Ricardo Condori - 2023-119013
+Yeferson Guerra Quispe - 2023-119021
 
----
-
-## 📝 Descripción del Proyecto
+## Descripción del Proyecto
 El proyecto extiende las capacidades del núcleo de XV6 mediante:
 
-1.  **Instrumentación (Trace):** Sistema para interceptar y visualizar las *syscalls* en tiempo real.
-2.  **Inspección de Kernel (Psmem):** Acceso seguro a la tabla de procesos (`ptable`) para monitorear estados y memoria.
-3.  **Métricas (Uptime):** Estadísticas de tiempo de actividad y concurrencia de procesos.
+1.  **Instrumentación (Trace): Sistema para interceptar y visualizar las syscalls en tiempo real.
+2.  **Inspección de Kernel (Psmem): Acceso seguro a la tabla de procesos (`ptable`) para monitorear estados y memoria.
+3.  **Métricas (Uptime): Estadísticas de tiempo de actividad y concurrencia de procesos.
+4.  **Contador de Syscalls (Syscount):Registro en el núcleo del número de invocaciones por cada llamada al sistema, 
+      con una nueva syscall (getsyscount) que permite consultar estas métricas desde el espacio de usuario.
 
----
-
-## ⚙️ Instrucciones de Compilación y Ejecución
+## Instrucciones de Compilación y Ejecución
 
 > ⚠️ **Requisito Previo:** Este proyecto usa un **compilador cruzado** para asegurar compatibilidad en Mac (Apple Silicon) y Windows (WSL).
 
 ### 1. Instalar Dependencias
 Ejecute el siguiente comando en su terminal (Ubuntu/Debian/WSL) para instalar el compilador `i686` necesario:
 
-```bash
-sudo apt-get update
-sudo apt-get install build-essential gdb git qemu-system-x86 gcc-i686-linux-gnu
+-sudo apt-get update
+-sudo apt-get install build-essential gdb git qemu-system-x86 gcc-i686-linux-gnu
 
 2. Compilar y Ejecutar (Modo Gráfico)
-Para compilar el sistema y lanzar el emulador QEMU:
+Para compilar el sistema y lanzar el emulador QEMU: make qemu
 
-Bash
-
-make qemu
 3. Ejecutar sin Gráficos (Para WSL o Servidores)
+
 Si su terminal no soporta ventanas, use el modo "No X":
 
-Bash
-
 make qemu-nox
+
 (Para salir de este modo: Presione Ctrl+A, suelte las teclas, y luego presione X).
 
 4. Limpieza
-Para eliminar los archivos compilados:
-
-Bash
+Para eliminar los archivos compilados: 
 
 make clean
-🎮 Guía de Uso de Nuevos Comandos
+
+*** Guía de Uso de Nuevos Comandos ***
 Una vez iniciado XV6 (verá el prompt $), puede probar las nuevas funcionalidades:
 
 1. Comando trace
@@ -61,10 +54,10 @@ Uso: trace [1|0]
 
 Ejemplo:
 
-Bash
+$trace 1      # Activa el rastreo (verá logs de syscalls)
+$ls            # Ejecute cualquier comando para ver sus llamadas
+$trace 0      # Desactiva el rastreo
 
-$trace 1      # Activa el rastreo (verá logs de syscalls)$ ls           # Ejecute cualquier comando para ver sus llamadas
-$ trace 0      # Desactiva el rastreo
 2. Comando psmem
 Muestra una tabla detallada con los procesos activos y su consumo de memoria.
 
@@ -86,3 +79,27 @@ Muestra el tiempo de actividad y la carga del sistema.
 Uso: uptime
 
 Salida: Tiempo en segundos/ticks y cantidad total de procesos activos.
+
+4. Comando syscount
+
+Consulta el número de invocaciones de las llamadas al sistema.
+
+Uso:
+
+# syscount <num_syscall>
+
+Ejemplo:
+$ syscount 5
+syscall 5 fue llamada 63 veces
+
+# syscount # (Sin parametros)
+
+Ejemplo:
+$ syscount
+syscall 1: 3
+syscall 2: 1
+syscall 3: 3
+syscall 7: 4
+syscall 10: 2
+......
+syscall 25: 27
